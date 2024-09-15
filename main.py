@@ -95,4 +95,4 @@ def admin():
 
 if __name__ == "__main__":
     init_db()
-    app.run(debug=False, port=5000, host='0.0.0.0')
+    app.run(debug=False, port=8080, host='0.0.0.0')
