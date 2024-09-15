@@ -1,3 +1,4 @@
+from types import MethodType
 from flask import Flask, render_template, request, url_for, redirect, flash
 import sqlite3
 import os
@@ -50,8 +51,30 @@ def signup():
     return redirect(url_for('login'))
   return render_template('signup.html')
 
-@app.route("/login")
+@app.route("/login", methods=['POST', 'GET'])
 def login():
+  if request.method == 'POST':
+    email = request.form['email']
+    password = request.form['password']
+    conn = sqlite3.connect('data.db')
+    cursor = conn.cursor()
+
+    # SQL-Abfrage zur Überprüfung von Email und Passwort
+    query = "SELECT * FROM users WHERE email = ? AND password = ?"
+
+    # Ausführen der Abfrage
+    cursor.execute(query, (email, password))
+
+    # Holen des Ergebnisses
+    result = cursor.fetchone()
+
+    # Verbindung schließen
+    conn.close()
+
+    if result:
+      return render_template('home.html', result=email, result2=password)
+    else:
+      return render_template('login.html')
   return render_template('login.html',)
 
 @app.route("/admin", methods=['POST', 'GET'])
