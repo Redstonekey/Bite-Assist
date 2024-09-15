@@ -11,8 +11,8 @@ def init_db():
       CREATE TABLE users (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           email TEXT NOT NULL,
-          passwort TEXT NOT NULL,
-          text TEXT NOT NULL
+          password TEXT NOT NULL,
+          text TEXT
       )
       ''')
       conn.commit()
@@ -30,21 +30,17 @@ def signup():
     email = request.form['email']
     password = request.form['password']
 
-    try:
-      conn = sqlite3.connect('data.db')
-      c = conn.cursor()
-      c.execute(
-          """INSERT INTO users (
-              email,
-              password,
-          ) VALUES (?, ?)""",
-          (email, password))
-      conn.commit()
-      conn.close()
-    except Exception as e:
-      
-      print(e)
-      return render_template('signup.html')
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    c.execute(
+        """INSERT INTO users (
+            email,
+            password
+        ) VALUES (?, ?)""",
+        (email, password))
+    conn.commit()
+    conn.close()
+
     
     print(email + ' ' +password)
 
