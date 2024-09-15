@@ -1,0 +1,18 @@
+<body style="text-align: center;">
+    <h1>Daten:</h1>
+    <table  border="1" >
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user[0] }}</td>
+            <td>{{ user[1] }}</td>
+            <td>{{ user[2] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br><br>
+</body>

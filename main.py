@@ -52,13 +52,23 @@ def signup():
 
 @app.route("/login")
 def login():
-  conn = sqlite3.connect('data.db')
-  c = conn.cursor()
-  c.execute("SELECT * FROM users")
-  users = c.fetchall()
-  conn.close()
-  return render_template('login.html', users=users)
+  return render_template('login.html',)
 
+@app.route("/admin", methods=['POST', 'GET'])
+def admin():
+  if request.method == 'POST':
+    password = request.form['password']
+    if password == 'test':
+      conn = sqlite3.connect('data.db')
+      c = conn.cursor()
+      c.execute("SELECT * FROM users")
+      users = c.fetchall()
+      conn.close()
+      return render_template('admin_login.html', users=users)
+    return render_template('admin.html')
+
+  else:
+    return render_template('admin.html')
 
 if __name__ == "__main__":
     init_db()
