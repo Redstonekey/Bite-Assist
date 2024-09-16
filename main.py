@@ -1,9 +1,9 @@
 from types import MethodType
-from flask import Flask, render_template, request, url_for, redirect, flash
+from flask import Flask, render_template, request, url_for, redirect, flash, session
 import sqlite3
 import os
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = 'asdfasdf'
 def init_db():
   if not os.path.exists('data.db'):
       conn = sqlite3.connect('data.db')
@@ -53,29 +53,49 @@ def signup():
 
 @app.route("/login", methods=['POST', 'GET'])
 def login():
-  if request.method == 'POST':
-    email = request.form['email']
-    password = request.form['password']
-    conn = sqlite3.connect('data.db')
-    cursor = conn.cursor()
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
 
-    # SQL-Abfrage zur Überprüfung von Email und Passwort
-    query = "SELECT * FROM users WHERE email = ? AND password = ?"
+        # Verbindung zur Datenbank
+        conn = sqlite3.connect('data.db')
+        cursor = conn.cursor()
+        query = "SELECT * FROM users WHERE email = ? AND password = ?"
+        cursor.execute(query, (email, password))
+        result = cursor.fetchone()
+        conn.close()
 
-    # Ausführen der Abfrage
-    cursor.execute(query, (email, password))
+        if result:
+            # Speichern von Nutzerdaten in der Session
+            session['email'] = email
+            return redirect(url_for('home'))
+        else:
+            flash('Falsche E-Mail oder Passwort')
+            return render_template('login.html')
+    return render_template('login.html')
 
-    # Holen des Ergebnisses
-    result = cursor.fetchone()
 
-    # Verbindung schließen
-    conn.close()
-
-    if result:
-      return render_template('home.html', result=email, result2=password)
+@app.route("/home")
+def home():
+    if 'email' in session:
+        email = session['email']
+        print(f"Email in Session gefunden: {email}")  # Debugging-Ausgabe
+        return render_template('home.html', email=email)
     else:
-      return render_template('login.html')
-  return render_template('login.html',)
+        flash('Du bist nicht eingeloggt!')
+        print("Keine Email in Session gefunden.")  # Debugging-Ausgabe
+        return redirect(url_for('login'))
+
+
+
+
+@app.route("/logout")
+def logout():
+    session.pop('email', None)  # Entfernt die E-Mail aus der Session
+    flash('Erfolgreich ausgeloggt')
+    return redirect(url_for('login'))
+
+  
 
 @app.route("/admin", methods=['POST', 'GET'])
 def admin():
