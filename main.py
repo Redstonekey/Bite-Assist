@@ -11,7 +11,7 @@ def init_db():
       c.execute('''
       CREATE TABLE users (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          email TEXT NOT NULL,
+          email TEXT NOT NULL UNIQUE,
           password TEXT NOT NULL,
           text TEXT
       )
@@ -30,17 +30,24 @@ def signup():
   if request.method == 'POST':
     email = request.form['email']
     password = request.form['password']
+    text = 'test test'
 
-    conn = sqlite3.connect('data.db')
-    c = conn.cursor()
-    c.execute(
-        """INSERT INTO users (
-            email,
-            password
-        ) VALUES (?, ?)""",
-        (email, password))
-    conn.commit()
-    conn.close()
+    try:
+      conn = sqlite3.connect('data.db') 
+      c = conn.cursor()
+      c.execute(
+          """INSERT INTO users (
+              email,
+              password,
+              text
+          ) VALUES (?, ?, ?)""",
+          (email, password, text))
+      conn.commit()
+      conn.close()
+    except Exception as e:
+      print(e)
+      flash('Email already exists')
+      return redirect(url_for('signup'))
 
     
     print(email + ' ' +password)
@@ -79,11 +86,18 @@ def login():
 def home():
     if 'email' in session:
         email = session['email']
-        print(f"Email in Session gefunden: {email}")  # Debugging-Ausgabe
-        return render_template('home.html', email=email)
+      
+        conn = sqlite3.connect('data.db')
+        cursor = conn.cursor()
+        query = "SELECT * FROM users WHERE email = ?"
+        cursor.execute(query, (email,))
+        result = cursor.fetchone()
+        conn.close()
+        
+      
+        return render_template('home.html', data=result)
     else:
         flash('Du bist nicht eingeloggt!')
-        print("Keine Email in Session gefunden.")  # Debugging-Ausgabe
         return redirect(url_for('login'))
 
 

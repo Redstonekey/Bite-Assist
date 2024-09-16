@@ -10,11 +10,13 @@
  <a> Loged in!</a>
 
 
-  {% for result in result %}
-      <a>{{ result[0] }}</a>
-  {% endfor %}
-  {% for result2 in result2 %}
-      <a>{{ result2[0] }}</a>
-  {% endfor %}
+    {% for data in data %}
+      <h1>{{ data[0] }}</h1>
+    
+       
+      <h1>{{ data[1] }}</h1>
+      
+      <h1>{{ data[2] }}</h1>
+    {% endfor %}
 </body>
 </html>
